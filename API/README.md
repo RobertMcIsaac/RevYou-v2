@@ -6,7 +6,7 @@ This is a boilerplate code for NestJS projects.
 
 The boilerplate code contains the following packages:
 
-1. Fastify (Highly performat web framework)
+1. Fastify (Highly performant web framework)
 2. Swagger (OpenAPI documentation generation)
 3. Pino (Logger)
 4. NestJS Throttler (Request Rate Limiter)
