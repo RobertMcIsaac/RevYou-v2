@@ -1,0 +1,40 @@
+.pacifico-regular {
+    font-family: "Pacifico", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+a {
+    display: inline-block;
+    background-color: transparent;
+    border: solid 1px transparent;
+    border-radius: 4px;
+    padding: 5px;
+
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        padding 0.3s ease;
+}
+
+a:hover {
+    background-color: light-dark(rgba(46, 48, 38, 0.6), rgb(90, 88, 88));
+    color: light-dark(#ffffff, #ffffff)
+    /* background-color: rgba(46, 48, 38, 0.6);
+    color: #ffffff; */
+}
+
+a:focus,
+a:active {
+    outline: none;
+    box-shadow: none;
+}

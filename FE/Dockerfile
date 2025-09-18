@@ -1,0 +1,34 @@
+FROM node:alpine AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+ARG VITE_BACKEND_URL
+ARG VITE_AUTH0_DOMAIN
+ARG VITE_AUTH0_CLIENT_ID
+ARG VITE_AUTH0_AUDIENCE
+ARG VITE_AUTH0_CALLBACK_URL
+
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+ENV VITE_AUTH0_DOMAIN=$VITE_AUTH0_DOMAIN
+ENV VITE_AUTH0_CLIENT_ID=$VITE_AUTH0_CLIENT_ID
+ENV VITE_AUTH0_AUDIENCE=$VITE_AUTH0_AUDIENCE
+ENV VITE_AUTH0_CALLBACK_URL=$VITE_AUTH0_CALLBACK_URL
+
+RUN npm run build
+
+
+FROM caddy:alpine AS runner
+
+WORKDIR /app
+
+COPY --from=build /app/dist /usr/share/caddy
+COPY Caddyfile /etc/caddy/Caddyfile
+
+EXPOSE 8080
+
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
