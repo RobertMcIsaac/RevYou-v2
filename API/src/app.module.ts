@@ -4,10 +4,12 @@ import pino from 'pino';
 import { ExampleModule } from './modules/example/example.module';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { DatabaseModule } from './modules/database/database.module';
 
 @Module({
   imports: [
     ExampleModule,
+    DatabaseModule,
     LoggerModule.forRoot({
       pinoHttp: {
         stream: pino.destination({
