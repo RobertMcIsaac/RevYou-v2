@@ -12,13 +12,4 @@ export class CampaignDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'The start date of the campaign' })
-  @IsString()
-  @IsNotEmpty()
-  startDate: string;
-
-  @ApiProperty({ description: 'The end date of the campaign' })
-  @IsString()
-  @IsNotEmpty()
-  endDate: string;
 }
