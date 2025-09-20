@@ -22,7 +22,7 @@ export class Campaign {
     type: [
       {
         project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
-        team: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Respondent' }],
+        team: [Respondent],
       },
     ],
   })
