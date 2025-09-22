@@ -4,10 +4,15 @@ import pino from 'pino';
 import { ExampleModule } from './modules/example/example.module';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { DatabaseModule } from './modules/database/database.module';
+import { CampaignModule } from './modules/campaign/campaign.module';
+import { UserModule } from './modules/user/user.module';
+import { ProjectModule } from './modules/project/project.module';
 
 @Module({
   imports: [
     ExampleModule,
+    DatabaseModule,
     LoggerModule.forRoot({
       pinoHttp: {
         stream: pino.destination({
@@ -28,6 +33,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
       ],
     }),
     ConfigModule.forRoot(),
+    CampaignModule,
+    UserModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [],

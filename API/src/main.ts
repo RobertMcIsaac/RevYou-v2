@@ -4,6 +4,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'pino-nestjs';
 
@@ -14,9 +15,11 @@ async function bootstrap() {
     { bufferLogs: true },
   );
 
+  app.useGlobalPipes(new ValidationPipe());
+
   const config = new DocumentBuilder()
-    .setTitle('MyApp')
-    .setDescription('MyApp Description')
+    .setTitle('RevYou')
+    .setDescription('RevYou API documentation')
     .setVersion('1.0')
     .build();
 

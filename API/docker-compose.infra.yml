@@ -1,0 +1,16 @@
+networks:
+  revyou-network:
+    driver: bridge
+
+services:
+  mongo-service:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./_data/db:/data/db
+    networks:
+      - revyou-network
+    restart: unless-stopped
+
+  
