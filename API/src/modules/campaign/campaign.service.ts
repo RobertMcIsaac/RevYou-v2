@@ -86,6 +86,7 @@ export class CampaignService {
     }
     return campaign;
   }
+
   async getCampaignByLink(linkUuid: string) {
     if (!linkUuid) {
       throw new Error('Link is not set');
@@ -132,134 +133,95 @@ export class CampaignService {
       },
     };
   }
+
+  async saveCampaignFeedback(
+    campaignId: string,
+    linkUuid: string,
+    responseContents: string,
+  ) {
+    if (!campaignId || !linkUuid || !responseContents) {
+      throw new Error(
+        'Campaign ID, team member link, and response contents are required',
+      );
+    }
+
+    const campaign = await this.campaignModel.findById(campaignId);
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    const projectEntry = campaign.projects.find((p) =>
+      p.team.some((member) => member.link.endsWith(linkUuid)),
+    );
+
+    if (!projectEntry) {
+      throw new Error('Project entry with the specified link not found');
+    }
+
+    const savedFeedback = await this.campaignModel.updateOne(
+      { _id: campaignId, 'projects.team.link': { $regex: `${linkUuid}$` } },
+      {
+        $set: { 'projects.$[project].team.$[member].responded': true },
+        $push: {
+          'projects.$[project].team.$[member].responses': {
+            content: responseContents,
+          },
+        },
+      },
+      {
+        arrayFilters: [
+          { 'project.project': projectEntry.project._id },
+          { 'member.link': { $regex: `${linkUuid}$` } },
+        ],
+      },
+    );
+
+    if (savedFeedback.modifiedCount === 0) {
+      throw new Error('Failed to save feedback');
+    }
+
+    return {
+      status: 'success',
+      message: 'Feedback saved successfully',
+    };
+  }
+
+  async getCampaignFeedback(campaignId: string, linkUuid: string) {
+    if (!campaignId || !linkUuid) {
+      throw new Error('Campaign ID and team member link are required');
+    }
+
+    const campaign = await this.campaignModel.findById(campaignId);
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    const projectEntry = campaign.projects.find((p) =>
+      p.team.some((member) => member.link.endsWith(linkUuid)),
+    );
+
+    if (!projectEntry) {
+      throw new Error('Project entry with the specified link not found');
+    }
+
+    const teamMember = projectEntry.team.find((member) =>
+      member.link.endsWith(linkUuid),
+    );
+
+    if (!teamMember) {
+      throw new Error('Team member with the specified link not found');
+    }
+
+    return {
+      project: projectEntry.project,
+      teamMember: {
+        fullName: teamMember.fullName,
+        email: teamMember.email,
+        role: teamMember.role,
+        link: teamMember.link,
+        isResponded: teamMember.responded,
+        responseContents: teamMember.responses || '',
+      },
+    };
+  }
 }
-
-//       fullName: member.fullName,
-//       email: member.email,
-//       role: member.role,
-//       link: member.link,
-//       isResponded: member.isResponded ?? false,
-//       responseContents: member.responseContents ?? "",
-//     }));
-
-//     return {
-//       project: _id,
-//       team,
-//     };
-//   });
-
-//   const campaign = new Campaign({
-//     title,
-//     description,
-//     createdBy: creatorId,
-//     projects: campaignProjects,
-//   });
-
-//   await campaign.save();
-
-//   return campaign;
-// };
-
-// const getCampaignsByUser = async (userId) => {
-//   if (!userId) {
-//     throw new Error("User ID is required");
-//   }
-
-//   return Campaign.find({ createdBy: userId }).populate("projects.project");
-// };
-
-// const getCampaignByIdService = async (campaignId) => {
-//   if (!campaignId) {
-//     throw new Error("Campaign ID is not set");
-//   }
-//   const campaign = await Campaign.findById(campaignId).populate("projects.project").populate("createdBy", "email fullName");
-//   if (!campaign) {
-//     throw new Error("Campaign not found");
-//   }
-//   return campaign;
-// }
-
-// const getCampaignByLinkService = async (linkUuid) => {
-//   if (!linkUuid) {
-//     throw new Error("Link is not set");
-//   }
-//   const campaign = await Campaign.findOne({ "projects.team.link": { $regex: `${linkUuid}$` } })
-//     .populate("projects.project")
-//     .populate("createdBy", "email firstName lastName");
-//   if (!campaign) {
-//     throw new Error("Campaign not found");
-//   }
-
-//   const projectEntry = campaign.projects.find((p) => p.team.some((member) => member.link.endsWith(linkUuid)));
-//   if (!projectEntry) {
-//     throw new Error("Project entry with the specified link not found");
-//   }
-//   const teamMember = projectEntry.team.find((member) => member.link.endsWith(linkUuid));
-//   if (!teamMember) {
-//     throw new Error("Team member with the specified link not found");
-//   }
-//   const campaignId = campaign._id.toString();
-//   return {
-//     "campaignId": campaignId,
-//     "title": campaign.title,
-//     "requestor": {
-//       "fullName": campaign.createdBy.firstName + " " + campaign.createdBy.lastName,
-//       "email": campaign.createdBy.email,
-//     },
-//     "project": {
-//       "title": projectEntry.project.title,
-//       "projectStartDate": projectEntry.project.startDate,
-//       "projectEndDate": projectEntry.project.endDate,
-//     },
-//     "teamMember": {
-//       "fullName": teamMember.fullName,
-//       "email": teamMember.email,
-//       "role": teamMember.role,
-//       "link": teamMember.link,
-//       "isResponded": teamMember.responded,
-//       "responseContents": teamMember.responses || "",
-//     },
-//   }
-// };
-
-// const saveCampaignFeedbackService = async (campaignId, linkUuid, responseContents) => {
-//   if (!campaignId || !linkUuid || !responseContents) {
-//     throw new Error("Campaign ID, team member link, and response contents are required");
-//   }
-//   const campaign = await Campaign.findById(campaignId);
-//   if (!campaign) {
-//     throw new Error("Campaign not found");
-//   }
-//   const projectEntry = campaign.projects.find((p) => p.team.some((member) => member.link.endsWith(linkUuid)));
-//   if (!projectEntry) {
-//     throw new Error("Project entry with the specified link not found");
-//   }
-//   const savedFeedback = await Campaign.updateOne(
-//     { _id: campaignId, "projects.team.link": { $regex: `${linkUuid}$` } },
-//     {
-//       $set: { "projects.$[project].team.$[member].responded": true },
-//       $push: { "projects.$[project].team.$[member].responses": { content:responseContents} },
-//     },
-//     {
-//       arrayFilters: [
-//         { "project.project": projectEntry.project._id },
-//         { "member.link": { $regex: `${linkUuid}$` } }
-//       ]
-//     }
-//   );
-//   if (savedFeedback.modifiedCount === 0) {
-//     throw new Error("Failed to save feedback");
-//   }
-//   return {
-//     status: "success",
-//     message: "Feedback saved successfully",
-//   };
-// }
-
-// module.exports = {
-//   createCampaign,
-//   getCampaignsByUser,
-//   getCampaignByIdService,
-//   getCampaignByLinkService,
-//   saveCampaignFeedbackService,
-// };
