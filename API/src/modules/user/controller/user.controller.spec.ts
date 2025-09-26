@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { CanActivate } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { UserController } from './user.controller';
 import { UserService } from '../service/user.service';
@@ -16,6 +18,10 @@ describe('UserController', () => {
   let userService: jest.Mocked<UserService>;
 
   beforeEach(async () => {
+    const mockThrottlerGuard: CanActivate = {
+      canActivate: jest.fn(() => true),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
@@ -24,10 +30,13 @@ describe('UserController', () => {
           useValue: userServiceMock,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(ThrottlerGuard)
+      .useValue(mockThrottlerGuard)
+      .compile();
 
-    userController = module.get(UserController);
-    userService = module.get(UserService);
+    userController = module.get<UserController>(UserController);
+    userService = module.get<jest.Mocked<UserService>>(UserService);
   });
 
   it('should be defined', () => {
@@ -58,7 +67,7 @@ describe('UserController', () => {
       const result = await userController.create(createUserDto);
 
       expect(result).toEqual(mockedUser);
-      expect(userService).toHaveBeenCalledWith(createUserDto);
+      expect(userServiceMock.create).toHaveBeenCalledWith(createUserDto);
     });
   });
 });

@@ -19,24 +19,25 @@
 
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Model, Types } from 'mongoose';
 import { UserService } from './user.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../schema/user.schema';
 
+// mocks are typed to avoid unbound-method errors
 const userModelMock = {
-  create: jest.fn(),
+  create: jest.fn<Promise<User>, [CreateUserDto]>(),
   find: jest.fn(),
-  findOne: jest.fn(),
+  findOne: jest.fn<{ exec: () => Promise<User | null> }, [Partial<User>]>(),
   findByIdAndUpdate: jest.fn(),
   findByIdAndDelete: jest.fn(),
 };
 
-describe('userService', () => {
-  let service: UserService;
-  let model: jest.Mocked<Model<User>>;
+describe('UserService', () => {
+  let userService: UserService;
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
@@ -47,57 +48,60 @@ describe('userService', () => {
       ],
     }).compile();
 
-    service = module.get(UserService);
-    model = module.get(getModelToken('User'));
+    userService = module.get(UserService);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(userService).toBeDefined();
   });
 
   describe('create', () => {
     it('should insert a new user', async () => {
-      const mockedUser: CreateUserDto = {
+      const createUserDto: CreateUserDto = {
         auth0Id: 'auth0|123',
         username: 'testUser',
         firstName: 'Test',
         lastName: 'User',
         email: 'testuser@example.com',
       };
-      model.create.mockResolvedValueOnce(mockedUser as any);
 
-      const createUserDto = {
+      const mockedUser: User = {
         auth0Id: 'auth0|123',
         username: 'testUser',
         firstName: 'Test',
         lastName: 'User',
         email: 'testuser@example.com',
-      };
-      const result = await service.create(createUserDto);
+      } as User;
+
+      userModelMock.create.mockResolvedValueOnce(mockedUser);
+
+      const result = await userService.create(createUserDto);
 
       expect(result).toEqual(mockedUser);
-      expect(model.create).toHaveBeenCalledWith(createUserDto);
+      expect(userModelMock.create).toHaveBeenCalledWith(createUserDto);
     });
   });
 
-  describe('findOne', () => {
+  describe('findOneByAuth0Id', () => {
     it('should return one user', async () => {
-      const mockedUser = {
+      const mockedUser: User = {
         auth0Id: 'auth0|123',
         username: 'testUser',
         firstName: 'Test',
         lastName: 'User',
         email: 'testuser@example.com',
-      };
-      model.findOne.mockReturnValueOnce({
+      } as User;
+
+      userModelMock.findOne.mockReturnValueOnce({
         exec: jest.fn().mockResolvedValueOnce(mockedUser),
-      } as any);
+      });
 
-      const id = new Types.ObjectId().toString();
-      const result = await service.findOne(id);
+      const result = await userService.findOneByAuth0Id(mockedUser.auth0Id);
 
-      expect(result).toEqual(mockedCat);
-      expect(model.findOne).toHaveBeenCalledWith({ _id: id });
+      expect(result).toEqual(mockedUser);
+      expect(userModelMock.findOne).toHaveBeenCalledWith({
+        auth0Id: mockedUser.auth0Id,
+      });
     });
   });
 });

@@ -12,14 +12,14 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    // if (!createUserDto.auth0Id || !createUserDto.email) {
-    //   throw new Error('A valid auth0 sub and email are required.');
-    // }
+    if (!createUserDto.auth0Id || !createUserDto.email) {
+      throw new Error('A valid auth0 sub and email are required.');
+    }
     const newUser = await this.userModel.create(createUserDto);
     return newUser;
   }
 
-  async findOneByAuth0Id(auth0Id: string): Promise<User> {
+  async findOneByAuth0Id(auth0Id: string): Promise<User | null> {
     const user = await this.userModel.findOne({ auth0Id: auth0Id }).exec();
     return user;
   }
