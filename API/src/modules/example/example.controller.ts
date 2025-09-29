@@ -6,7 +6,7 @@ import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 export class ExampleController {
   constructor(private readonly exampleService: ExampleService) {}
 
-  @Get()
+  @Get('/')
   printExample() {
     return {
       message: 'This is an example message from controller',

@@ -12,4 +12,12 @@ export class ResponseDto {
   })
   @IsNotEmpty()
   content: string;
+
+  @ApiProperty({ description: 'The date when the response was created' })
+  @IsNotEmpty()
+  createdAt: Date;
+
+  @ApiProperty({ description: 'The date when the response was last updated' })
+  @IsNotEmpty()
+  updatedAt: Date;
 }

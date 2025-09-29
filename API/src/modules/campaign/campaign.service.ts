@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { InjectModel } from '@nestjs/mongoose';
-import { Campaign } from './schema/campaign.schema';
+import { Campaign, CampaignDocument } from './schema/campaign.schema';
 import { Model, Types } from 'mongoose';
 import { ProjectService } from '../project/project.service';
-import { Project } from '../project/schema/project.schema';
+import { Project, ProjectDocument } from '../project/schema/project.schema';
 import { Respondent } from './schema/subdocument/respondent.schema';
 
 interface ProjectWithTeam extends Project {
@@ -14,7 +14,7 @@ interface ProjectWithTeam extends Project {
 @Injectable()
 export class CampaignService {
   constructor(
-    @InjectModel(Campaign.name) private campaignModel: Model<Campaign>,
+    @InjectModel(Campaign.name) private campaignModel: Model<CampaignDocument>,
     private readonly userService: UserService,
     private readonly projectService: ProjectService,
   ) {}
@@ -44,7 +44,7 @@ export class CampaignService {
             email: member.email,
             role: member.role,
             link: member.link,
-            responded: member.responded ?? false,
+            isResponded: member.isResponded ?? false,
           }))
         : undefined;
 
@@ -111,6 +111,17 @@ export class CampaignService {
     if (!teamMember) {
       throw new Error('Team member with the specified link not found');
     }
+
+    const projectDoc =
+      typeof projectEntry.project === 'object' &&
+      'title' in projectEntry.project
+        ? (projectEntry.project as unknown as ProjectDocument)
+        : null;
+
+    if (!projectDoc) {
+      throw new Error('Project details not found');
+    }
+
     const campaignId = campaign._id.toString();
     return {
       campaignId: campaignId,
@@ -121,9 +132,9 @@ export class CampaignService {
         email: campaign.createdBy.email,
       },
       project: {
-        title: projectEntry.project.title,
-        projectStartDate: projectEntry.project.startDate,
-        projectEndDate: projectEntry.project.endDate,
+        title: projectDoc.title,
+        projectStartDate: projectDoc.startDate,
+        projectEndDate: projectDoc.endDate,
       },
       teamMember: {
         fullName: teamMember.fullName,
@@ -170,7 +181,8 @@ export class CampaignService {
       },
       {
         arrayFilters: [
-          { 'project.project': projectEntry.project._id },
+          // { 'project.project': projectEntry.project._id },
+          { 'project._id': projectEntry.project },
           { 'member.link': { $regex: `${linkUuid}$` } },
         ],
       },
@@ -219,7 +231,7 @@ export class CampaignService {
         email: teamMember.email,
         role: teamMember.role,
         link: teamMember.link,
-        isResponded: teamMember.responded,
+        isResponded: teamMember.isResponded,
         responseContents: teamMember.responses || '',
       },
     };

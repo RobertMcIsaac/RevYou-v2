@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import * as mongoose from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { User } from '@modules/user/schema/user.schema';
-import { Respondent } from './subdocument/respondent.schema';
+import { Respondent, RespondentSchema } from './subdocument/respondent.schema';
 import { Project } from '@modules/project/schema/project.schema';
 
 export type CampaignDocument = HydratedDocument<Campaign>;
@@ -15,19 +14,19 @@ export class Campaign {
   @Prop({ required: false })
   description: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: 'User' })
   createdBy: User;
 
   @Prop({
     type: [
       {
-        project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
-        team: [Respondent],
+        project: { type: Types.ObjectId, ref: Project.name },
+        team: [{ type: [RespondentSchema], default: [] }],
       },
     ],
   })
   projects: {
-    project: Project;
+    project: Types.ObjectId;
     team: Respondent[];
   }[];
 }
