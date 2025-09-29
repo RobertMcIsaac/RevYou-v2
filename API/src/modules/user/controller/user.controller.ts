@@ -11,16 +11,23 @@ import { User } from '../schema/user.schema';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // @Throttle({ default: { limit: 3, ttl: 60000 } })
+  // @UseGuards(ThrottlerGuard)
   @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.create(createUserDto);
+  async create(@Body() user: CreateUserDto): Promise<User> {
+    const res = await this.userService.create(user);
+    return res;
   }
 
+  // @Throttle({ default: { limit: 3, ttl: 60000 } })
+  // @UseGuards(ThrottlerGuard)
   @Get('me')
-  async findOneByAuth0Id(@Body() createUserDto: CreateUserDto): Promise<User>  {
-    const auth0Id: string = createUserDto.auth0Id;
-    const user = await this.userService.findOneByAuth0Id(auth0Id);
-    return user;
+  async findOneByAuth0Id(@Body() user: CreateUserDto): Promise<User | null> {
+    const auth0Id: string = user.auth0Id;
+    // Need to extract sub from decoded access token, not from user
+    const res = await this.userService.findOneByAuth0Id(auth0Id);
+    console.log('UserController - findOneByAuth0Id result:', res);
+    return res;
   }
 
   // @Get('me')
@@ -29,8 +36,6 @@ export class UserController {
   //   // Always get sub from Access token (decoded with checkJwt), not from ID token
 
   // Apply rate limiting: max 3 requests per minute
-  // @Throttle({ default: { limit: 3, ttl: 60000 } })
-  // @UseGuards(ThrottlerGuard)
 }
 
 // getUser()

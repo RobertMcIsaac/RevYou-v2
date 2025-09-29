@@ -1,23 +1,42 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
 
 export class CreateUserDto {
+  @ApiProperty({ description: 'The Auth0 ID of the user' })
+  @IsString()
   @IsNotEmpty()
-  @IsString()
-  auth0Id!: string;
+  auth0Id: string;
 
+  @ApiProperty({ description: 'The username of the user' })
+  @Matches('^[a-zA-Z0-9_.]+$', '', {
+    message:
+      'Username can only contain letters, numbers, underscores, or dots.',
+  })
+  @IsNotEmpty()
+  username: string;
+
+  @ApiProperty({ description: 'The first name of the user' })
+  @Matches("^[a-zA-ZÀ-ÿ' -]+$", '', {
+    message: 'First name contains invalid characters.',
+  })
   @IsOptional()
-  @IsString()
   firstName?: string;
 
+  @ApiProperty({ description: 'The last name of the user' })
+  @Matches("^[a-zA-ZÀ-ÿ' -]+$", '', {
+    message: 'Last name contains invalid characters.',
+  })
   @IsOptional()
-  @IsString()
   lastName?: string;
 
-  @IsOptional()
-  @IsString()
-  username?: string;
-
-  @IsNotEmpty()
+  @ApiProperty({ description: 'The email of the user' })
   @IsEmail()
-  email!: string;
+  @IsNotEmpty()
+  email: string;
 }
