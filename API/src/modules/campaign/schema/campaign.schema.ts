@@ -21,7 +21,7 @@ export class Campaign {
     type: [
       {
         project: { type: Types.ObjectId, ref: Project.name },
-        team: [{ type: [RespondentSchema], default: [] }],
+        team: { type: [RespondentSchema], default: [] },
       },
     ],
   })

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Campaign, CampaignDocument } from './schema/campaign.schema';
@@ -70,9 +70,10 @@ export class CampaignService {
     }
 
     return await this.campaignModel
-      .find({ createdBy: userId })
+      .find({ createdBy: new Types.ObjectId(userId) })
       .populate('projects.project');
   }
+
   async getCampaignById(campaignId: string) {
     if (!campaignId) {
       throw new Error('Campaign ID is not set');
@@ -91,12 +92,15 @@ export class CampaignService {
     if (!linkUuid) {
       throw new Error('Link is not set');
     }
+
+    console.log('Searching for campaign with link:', linkUuid);
+    
     const campaign = await this.campaignModel
       .findOne({ 'projects.team.link': { $regex: `${linkUuid}$` } })
       .populate('projects.project')
       .populate('createdBy', 'email firstName lastName');
     if (!campaign) {
-      throw new Error('Campaign not found');
+      throw new NotFoundException('Campaign not found');
     }
 
     const projectEntry = campaign.projects.find((p) =>
