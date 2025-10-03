@@ -11,27 +11,30 @@ export class ProjectService {
   ) {}
 
   async findOrCreateProjects(projects: CreateProjectDto[]) {
-    const projectIds: Types.ObjectId[] = [];
-
-    for (const project of projects) {
-      const projectDoc = await this.projectModel
-        .findOneAndUpdate(
-          { title: project.title },
-          { $setOnInsert: { ...project } },
-          { new: true, upsert: true },
-        )
-        .select('_id')
-        .exec();
-      projectIds.push(projectDoc._id);
-    }
-
+    const projectDocs = await Promise.all(
+      projects.map(project =>
+        this.projectModel
+          .findOneAndUpdate(
+            { title: project.title },
+            { $setOnInsert: { ...project } },
+            { new: true, upsert: true },
+          )
+          .select('_id')
+          .exec()
+      )
+    );
+    const projectIds: Types.ObjectId[] = projectDocs.map(doc => doc._id);
     return projectIds;
   }
 
   async searchProjectsByTitle(partialTitle: string): Promise<Project[]> {
+    // Escape regex metacharacters in partialTitle to prevent regex injection
+    const escapeRegex = (str: string) =>
+      str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeTitle = escapeRegex(partialTitle);
     return this.projectModel
       .find({
-        title: { $regex: partialTitle, $options: 'i' },
+        title: { $regex: safeTitle, $options: 'i' },
       })
       .limit(10);
   }

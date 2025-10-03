@@ -32,12 +32,7 @@ export class CampaignService {
     description?: string,
   ) {
     this.logger.debug(
-      `Creating campaign with parameters: ${JSON.stringify({
-        title,
-        createdBy,
-        projects,
-        description,
-      })}`,
+      `Creating campaign: title="${title}", createdBy=[REDACTED], projectsCount=${projects.length}, descriptionLength=${description ? description.length : 0}`
     );
 
     if (!title || !createdBy || !projects) {
@@ -82,7 +77,7 @@ export class CampaignService {
       projects: campaignProjects,
     };
 
-    this.logger.log('Creating new campaign:', newCampaign);
+    this.logger.log(`Creating new campaign: ${JSON.stringify(newCampaign)}`);
     return await this.campaignModel.create(newCampaign);
   }
 
@@ -294,7 +289,7 @@ export class CampaignService {
         role: teamMember.role,
         link: teamMember.link,
         isResponded: teamMember.isResponded,
-        responseContents: teamMember.responses || '',
+        responseContents: teamMember.responses || [],
       },
     };
   }
