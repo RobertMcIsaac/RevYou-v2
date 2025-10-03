@@ -11,6 +11,7 @@ import { Model, Types } from 'mongoose';
 import { ProjectService } from '../project/project.service';
 import { Project, ProjectDocument } from '../project/schema/project.schema';
 import { Respondent } from './schema/subdocument/respondent.schema';
+import { escapeRegex } from '@/common/helper/escape-regex.helper';
 
 interface ProjectWithTeam extends Project {
   team?: Respondent[];
@@ -32,7 +33,7 @@ export class CampaignService {
     description?: string,
   ) {
     this.logger.debug(
-      `Creating campaign: title="${title}", createdBy=[REDACTED], projectsCount=${projects.length}, descriptionLength=${description ? description.length : 0}`
+      `Creating campaign: title="${title}", createdBy=[REDACTED], projectsCount=${projects.length}, descriptionLength=${description ? description.length : 0}`,
     );
 
     if (!title || !createdBy || !projects) {
@@ -117,7 +118,9 @@ export class CampaignService {
     }
 
     const campaign = await this.campaignModel
-      .findOne({ 'projects.team.link': { $regex: `${linkUuid}$` } })
+      .findOne({
+        'projects.team.link': { $regex: `${escapeRegex(linkUuid)}$` },
+      })
       .populate('projects.project')
       .populate('createdBy', 'email firstName lastName');
     if (!campaign) {

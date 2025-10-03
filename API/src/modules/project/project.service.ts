@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Project, ProjectDocument } from './schema/project.schema';
 import { Model, Types } from 'mongoose';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { escapeRegex } from '@/common/helper/escape-regex.helper';
 
 @Injectable()
 export class ProjectService {
@@ -12,7 +13,7 @@ export class ProjectService {
 
   async findOrCreateProjects(projects: CreateProjectDto[]) {
     const projectDocs = await Promise.all(
-      projects.map(project =>
+      projects.map((project) =>
         this.projectModel
           .findOneAndUpdate(
             { title: project.title },
@@ -20,21 +21,17 @@ export class ProjectService {
             { new: true, upsert: true },
           )
           .select('_id')
-          .exec()
-      )
+          .exec(),
+      ),
     );
-    const projectIds: Types.ObjectId[] = projectDocs.map(doc => doc._id);
+    const projectIds: Types.ObjectId[] = projectDocs.map((doc) => doc._id);
     return projectIds;
   }
 
   async searchProjectsByTitle(partialTitle: string): Promise<Project[]> {
-    // Escape regex metacharacters in partialTitle to prevent regex injection
-    const escapeRegex = (str: string) =>
-      str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const safeTitle = escapeRegex(partialTitle);
     return this.projectModel
       .find({
-        title: { $regex: safeTitle, $options: 'i' },
+        title: { $regex: escapeRegex(partialTitle), $options: 'i' },
       })
       .limit(10);
   }

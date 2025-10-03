@@ -15,7 +15,6 @@ export class CampaignController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async createNewCampaign(@Body() campaign: CampaignDto) {
-    console.log('Received campaign data:', campaign);
     return await this.campaignService.createCampaign(
       campaign.title,
       campaign.createdBy,
@@ -76,7 +75,6 @@ export class CampaignController {
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async saveCampaignFeedback(@Body() feedback: FeedbackDto) {
-    console.log('Received feedback data(controller):', feedback);
     const { campaignId, linkUuid, responseContents } = feedback;
     return await this.campaignService.saveCampaignFeedback(
       campaignId,
