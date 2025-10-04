@@ -9,13 +9,13 @@ export class Project {
   title: string;
 
   @Prop({ required: false })
-  description: string;
+  description?: string;
 
   @Prop({ required: true })
   startDate: Date;
 
   @Prop({ required: false })
-  endDate: Date;
+  endDate?: Date;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

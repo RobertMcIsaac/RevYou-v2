@@ -16,10 +16,10 @@ export class Respondent {
   link: string;
 
   @Prop({ default: false })
-  responded: boolean;
+  isResponded: boolean;
 
   @Prop({ type: [Response], default: [] })
-  responses: Response[];
+  responses?: Response[];
 }
 
 export const RespondentSchema = SchemaFactory.createForClass(Respondent);

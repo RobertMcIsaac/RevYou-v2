@@ -1,7 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  MinLength,
+  IsDateString,
+} from 'class-validator';
 
 export class ResponseDto {
+  // TODO: Consider varibale name alignment (responseContent vs content)
+
   @ApiProperty({ description: 'The content of the response' })
   @IsString()
   @MinLength(100, {
@@ -12,4 +20,9 @@ export class ResponseDto {
   })
   @IsNotEmpty()
   content: string;
+
+  @ApiProperty({ description: 'The date when the response was created' })
+  @IsNotEmpty()
+  @IsDateString()
+  createdAt: Date;
 }

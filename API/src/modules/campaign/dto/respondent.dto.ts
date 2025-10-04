@@ -3,7 +3,6 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -32,11 +31,26 @@ export class RespondentDto {
     example: 'Product Manager',
   })
   @IsString()
-  @IsOptional()
-  role?: string;
+  @IsNotEmpty()
+  role: string;
+
+  @ApiProperty({
+    description: 'Unique link for the respondent',
+    example:
+      'https://revyou-app.netlify.app/feedback/460945ee-b810-4051-9924-e4ec2fa75d32',
+  })
+  @IsString()
+  link: string;
+
+  @ApiProperty({
+    description: 'Whether the respondent has responded',
+    example: false,
+  })
+  @IsNotEmpty()
+  isResponded: boolean;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ResponseDto)
-  responses: ResponseDto[];
+  responses?: ResponseDto[] = [];
 }
