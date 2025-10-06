@@ -12,7 +12,7 @@ import {
 import type { FastifyRequest } from 'fastify';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Auth0Payload } from '../auth/auth0-payload';
+import { Auth0PayloadDto } from '../auth/dto/auth0Payload.dto';
 import { UsersDto } from './dto/users.dto';
 
 @Controller('users')
@@ -28,7 +28,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Get()
   findOneByAuth0Sub(
-    @Req() req: FastifyRequest & { user: Auth0Payload },
+    @Req() req: FastifyRequest & { user: Auth0PayloadDto },
   ): UsersDto | null {
     // Passport writes the validated Auth0 token information to req.user
     const { sub } = req.user;
@@ -43,7 +43,6 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   create(@Body('user') user: UsersDto): UsersDto | null {
-    console.log('CONTROLLER user created: ', user);
     return this.usersService.create(user);
   }
 }

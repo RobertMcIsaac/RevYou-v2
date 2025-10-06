@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersDto } from './dto/users.dto';
 
-// This should be a real class/interface representing a user entity
+// This will be a real class/interface representing a user entity
 export type User = any;
 
 @Injectable()
@@ -37,7 +37,6 @@ export class UsersService {
 
   create(user: UsersDto): UsersDto | null {
     this.users.push(user);
-    console.log('SERVICE user created: ', this.users);
     return this.users[-1]
   }
 }

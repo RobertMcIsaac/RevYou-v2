@@ -6,7 +6,7 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 
-export class Auth0Payload {
+export class Auth0PayloadDto {
   @IsNotEmpty()
   @IsString()
   iss!: string;
@@ -16,8 +16,9 @@ export class Auth0Payload {
   sub!: string;
 
   @IsNotEmpty()
-  @IsArray()
-  @IsString({ each: true })
+  // @IsArray()
+  // @IsString({ each: true })
+  @IsString()
   aud!: string[];
 
   @IsOptional()
@@ -36,4 +37,8 @@ export class Auth0Payload {
   @IsArray()
   @IsString({ each: true })
   scope?: string | string[];
+
+  @IsOptional()
+  @IsString()
+  gty?: string;
 }

@@ -5,7 +5,7 @@ import { passportJwtSecret } from 'jwks-rsa';
 import * as dotenv from 'dotenv';
 // import { AuthService } from './auth.service';
 // import { User } from '../users/users.service';
-import { Auth0Payload } from './auth0-payload';
+import { Auth0PayloadDto } from './dto/auth0Payload.dto';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 
@@ -35,14 +35,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   //   return payload;
   // }
 
-  validate(payload: unknown): Auth0Payload {
+  validate(payload: unknown): Auth0PayloadDto {
     if (typeof payload !== 'object' || payload === null) {
-      throw new UnauthorizedException('Invalid Auth0 payload');
+      throw new UnauthorizedException('payload is not an object or is null');
     }
 
     // transforms a plain javascript object (the payload) to instance of specific class (Auth0Payload)
     // i.e. makes sure payload matches shape of Auth0Payload class
-    const auth0Payload = plainToInstance(Auth0Payload, payload);
+    const auth0Payload = plainToInstance(Auth0PayloadDto, payload);
 
     // executes the validation rules defined in the Auth0Payload class
     // whitelist: true removes any properties that do not have any decorators
