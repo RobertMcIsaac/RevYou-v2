@@ -1,6 +1,10 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ExampleService } from './example.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import type { FastifyRequest } from 'fastify';
+import { AuthGuard } from '@nestjs/passport';
+import { Req } from '@nestjs/common/decorators';
+import { Auth0Payload } from '../auth/auth0-payload';
 
 @Controller('example')
 export class ExampleController {
@@ -10,6 +14,16 @@ export class ExampleController {
   printExample() {
     return {
       message: 'This is an example message from controller',
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('protected-route')
+  access(@Req() req: FastifyRequest & { user: Auth0Payload }) {
+    return {
+      message: 'This is a protected route',
+      // Passport writes the validated Auth0 token information to req.user
+      user: req.user,
     };
   }
 
