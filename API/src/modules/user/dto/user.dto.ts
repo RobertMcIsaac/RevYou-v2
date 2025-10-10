@@ -29,6 +29,7 @@ export class UserDto {
     message: 'First name contains invalid characters.',
   })
   @IsOptional()
+  // @Expose({ name: 'given_name' })
   firstName?: string;
 
   @ApiProperty({ description: 'The last name of the user', example: 'Doe' })
@@ -36,6 +37,7 @@ export class UserDto {
     message: 'Last name contains invalid characters.',
   })
   @IsOptional()
+  // @Expose({ name: 'family_name' })
   lastName?: string;
 
   @ApiProperty({

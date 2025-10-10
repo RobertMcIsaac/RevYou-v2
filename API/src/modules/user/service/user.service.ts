@@ -11,12 +11,12 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    if (!createUserDto.auth0Id || !createUserDto.email) {
+  async create(newUser: CreateUserDto): Promise<User> {
+    if (!newUser.auth0Id || !newUser.email) {
       throw new Error('A valid auth0 sub and email are required.');
     }
-    const newUser = await this.userModel.create(createUserDto);
-    return newUser;
+    const user = await this.userModel.create(newUser);
+    return user.save();
   }
 
   async findOneByAuth0Id(auth0Id: string): Promise<User | null> {
