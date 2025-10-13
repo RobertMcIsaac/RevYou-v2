@@ -39,16 +39,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (typeof payload !== 'object' || payload === null) {
       throw new UnauthorizedException('payload is not an object or is null');
     }
-
     // transforms a plain javascript object (the payload) to instance of specific class (Auth0Payload)
     // i.e. makes sure payload matches shape of Auth0Payload class
     const auth0Payload = plainToInstance(Auth0PayloadDto, payload);
 
     // executes the validation rules defined in the Auth0Payload class
-    // whitelist: true removes any properties that do not have any decorators
-    const errors = validateSync(auth0Payload, { whitelist: true });
+    const errors = validateSync(auth0Payload);
 
-    if (errors.length > 0) {
+    if (errors.length > 0 || !auth0Payload.sub) {
       throw new UnauthorizedException('Invalid Auth0 payload');
     }
 
