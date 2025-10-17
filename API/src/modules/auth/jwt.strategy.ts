@@ -3,8 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { passportJwtSecret } from 'jwks-rsa';
 import * as dotenv from 'dotenv';
-// import { AuthService } from './auth.service';
-// import { User } from '../users/users.service';
 import { Auth0PayloadDto } from './dto/auth0Payload.dto';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
@@ -31,6 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // ORIGINAL METHOD FROM AUTH0 GUIDE
   // validate(payload: unknown): unknown {
   //   return payload;
   // }
