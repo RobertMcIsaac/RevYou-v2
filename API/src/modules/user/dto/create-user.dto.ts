@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
@@ -5,18 +6,14 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 
-export class UserDto {
-  @ApiProperty({
-    description: 'The Auth0 ID of the user',
-    example: 'auth0|1234567890',
-  })
+export class CreateUserDto {
+  @ApiProperty({ description: 'The Auth0 ID of the user' })
   @IsString()
   @IsNotEmpty()
   auth0Id: string;
 
-  @ApiProperty({ description: 'The username of the user', example: 'john_doe' })
+  @ApiProperty({ description: 'The username of the user' })
   @Matches('^[a-zA-Z0-9_.]+$', '', {
     message:
       'Username can only contain letters, numbers, underscores, or dots.',
@@ -24,26 +21,21 @@ export class UserDto {
   @IsNotEmpty()
   username: string;
 
-  @ApiProperty({ description: 'The first name of the user', example: 'John' })
+  @ApiProperty({ description: 'The first name of the user' })
   @Matches("^[a-zA-ZÀ-ÿ' -]+$", '', {
     message: 'First name contains invalid characters.',
   })
   @IsOptional()
-  // @Expose({ name: 'given_name' })
   firstName?: string;
 
-  @ApiProperty({ description: 'The last name of the user', example: 'Doe' })
+  @ApiProperty({ description: 'The last name of the user' })
   @Matches("^[a-zA-ZÀ-ÿ' -]+$", '', {
     message: 'Last name contains invalid characters.',
   })
   @IsOptional()
-  // @Expose({ name: 'family_name' })
   lastName?: string;
 
-  @ApiProperty({
-    description: 'The email of the user',
-    example: 'john.doe@example.com',
-  })
+  @ApiProperty({ description: 'The email of the user' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
