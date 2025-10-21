@@ -40,6 +40,7 @@ async function bootstrap() {
     .setTitle('RevYou')
     .setDescription('RevYou API documentation')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
