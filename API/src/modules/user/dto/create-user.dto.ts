@@ -8,17 +8,11 @@ import {
   Matches,
 } from 'class-validator';
 
-// import { OmitType, PartialType } from "@nestjs/swagger";
-// import { UserDto } from "./user.dto";
-
-// export class CreateUserDto extends PartialType(UserDto) {}
-
 export class CreateUserDto {
-  // auth0Id
-  @ApiProperty({ description: 'The Auth0 ID of the user' })
+  // auth0Id - ignored
+  @ApiProperty({ description: 'The Auth0 ID of the user', readOnly: true })
   @IsString()
-  @IsNotEmpty()
-  @Expose({ name: 'sub' }) // maps auth0 field names to our DB field names
+  @IsOptional() // auth0Id will be set from token, not from request
   auth0Id: string;
 
   // username
@@ -28,7 +22,7 @@ export class CreateUserDto {
       'Username can only contain letters, numbers, underscores, or dots.',
   })
   @IsNotEmpty()
-  @Expose({ name: 'nickname' })
+  @Expose({ name: 'nickname' }) // maps auth0 field names to our DB field names
   username: string;
 
   // firstName
@@ -37,7 +31,7 @@ export class CreateUserDto {
     message: 'First name contains invalid characters.',
   })
   @IsOptional()
-  @Expose({ name: 'given_name' })
+  @Expose({ name: 'given_name' }) // maps auth0 field names to our DB field names
   firstName?: string;
 
   // lastName
@@ -46,7 +40,7 @@ export class CreateUserDto {
     message: 'Last name contains invalid characters.',
   })
   @IsOptional()
-  @Expose({ name: 'family_name' })
+  @Expose({ name: 'family_name' }) // maps auth0 field names to our DB field names
   lastName?: string;
 
   // email
