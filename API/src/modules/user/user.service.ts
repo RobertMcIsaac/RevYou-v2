@@ -31,10 +31,26 @@ export class UserService {
     }
   }
 
-  // FIND USER BY AUTH) ID
+  // FIND USER BY AUTH0 ID
   async findOneByAuth0Id(sub: string): Promise<User> {
     try {
       const user = await this.userModel.findOne({ auth0Id: sub }).exec();
+      if (!user) {
+        throw new NotFoundException('User not found.');
+      }
+      return user;
+    } catch (error) {
+      console.log('Error finding user.', error);
+      throw new InternalServerErrorException(
+        'Internal server error while fetching user.',
+      );
+    }
+  }
+
+  // FIND USER BY MONGODB ID
+  async findUserById(id: string): Promise<User> {
+    try {
+      const user = await this.userModel.findById(id).exec();
       if (!user) {
         throw new NotFoundException('User not found.');
       }
