@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CampaignService } from './campaign.service';
 import { CampaignDto } from './dto/campaign.dto';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackDto } from './dto/feedback.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('campaigns')
 @ApiTags('Campaigns')
@@ -14,6 +23,7 @@ export class CampaignController {
   @ApiResponse({ status: 201, description: 'Campaign created successfully.' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
+  @UseGuards(AuthGuard('jwt'))
   async createNewCampaign(@Body() campaign: CampaignDto) {
     return await this.campaignService.createCampaign(
       campaign.title,

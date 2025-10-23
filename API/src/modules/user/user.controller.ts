@@ -26,7 +26,7 @@ import { User } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@Throttle({ default: { limit: 3, ttl: 60000 } }) // Apply rate limiting: max 3 requests per minute
+// @Throttle({ default: { limit: 3, ttl: 60000 } }) // Apply rate limiting: max 3 requests per minute
 @UseGuards(ThrottlerGuard)
 @Controller('users')
 @ApiTags('Users')
