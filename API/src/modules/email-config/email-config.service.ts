@@ -1,8 +1,14 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { EmailConfig, EmailConfigDocument } from './schema/email-config.schema';
 import { Model, Types } from 'mongoose';
 import { CreateEmailConfigDto } from './dto/create-email-config.dto';
+import { decrypt, encrypt } from '@/common/helper/cryptography.helper';
 
 @Injectable()
 export class EmailConfigService {
@@ -12,9 +18,15 @@ export class EmailConfigService {
     private emailConfigModel: Model<EmailConfigDocument>,
   ) {}
 
-  // TODO: Deconstruct DTO and add sensitive data encryption
   async createEmailConfig(createEmailConfigDto: CreateEmailConfigDto) {
-    const emailConfig = new this.emailConfigModel(createEmailConfigDto);
+    const updatedEmailConfigDto = {
+      ...createEmailConfigDto,
+      emailPassword: encrypt(createEmailConfigDto.emailPassword),
+    };
+    const emailConfig = new this.emailConfigModel(updatedEmailConfigDto);
+    this.logger.log(
+      `Creating email configuration for userId=${createEmailConfigDto.userId}`,
+    );
     return await emailConfig.save();
   }
 
@@ -24,22 +36,44 @@ export class EmailConfigService {
       throw new BadRequestException('User id is required');
     }
 
-    return this.emailConfigModel.findOne({
-      userId: new Types.ObjectId(userId),
-    });
+    this.logger.log(`Fetching email configuration for userId=${userId}`);
+    const emailConfig = await this.emailConfigModel
+      .findOne({
+        userId,
+      })
+      .exec();
+
+    if (!emailConfig) {
+      this.logger.warn(`No email configuration found for userId=${userId}`);
+      throw new NotFoundException('Email configuration not found');
+    }
+    const decrypedEmailConfig = {
+      ...emailConfig.toObject(),
+      emailPassword: decrypt(emailConfig.emailPassword),
+    };
+    return decrypedEmailConfig;
   }
 
-  async updateEmailConfig(userId: string, emailConfig: EmailConfigDocument) {
+  // TODO: Change the structure of dto to allow partial updates
+  async updateEmailConfig(userId: string, emailConfig: CreateEmailConfigDto) {
     if (!userId) {
       this.logger.warn('User id is required');
       throw new BadRequestException('User id is required');
     }
 
+    const updatedEmailConfig = {
+      ...emailConfig,
+      emailPassword: encrypt(emailConfig.emailPassword),
+    };
+
     return this.emailConfigModel
-      .findOneAndUpdate({
-        userId: new Types.ObjectId(userId),
-        emailConfig: emailConfig,
-      })
+      .findOneAndUpdate(
+        {
+          userId: new Types.ObjectId(userId),
+        },
+        updatedEmailConfig,
+        { new: true },
+      )
       .exec();
   }
 }

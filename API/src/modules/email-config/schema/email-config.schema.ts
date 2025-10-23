@@ -10,7 +10,7 @@ export class EmailConfig {
   userId: User;
 
   @Prop({ required: true })
-  emailUsername: string;
+  emailUserName: string;
 
   @Prop({ required: true })
   emailPassword: string;
@@ -28,4 +28,4 @@ export class EmailConfig {
   emailSslTls: boolean;
 }
 
-export const EmailConfgSchema = SchemaFactory.createForClass(EmailConfig);
+export const EmailConfigSchema = SchemaFactory.createForClass(EmailConfig);
