@@ -9,6 +9,7 @@ import { CampaignModule } from './modules/campaign/campaign.module';
 import { UserModule } from './modules/user/user.module';
 import { ProjectModule } from './modules/project/project.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { EmailConfigModule } from './modules/email-config/email-config.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AuthModule } from './modules/auth/auth.module';
     UserModule,
     ProjectModule,
     AuthModule,
+    EmailConfigModule,
   ],
   controllers: [],
   providers: [],
