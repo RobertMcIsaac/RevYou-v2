@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { EmailConfig, EmailConfigDocument } from './schema/email-config.schema';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { CreateEmailConfigDto } from './dto/create-email-config.dto';
 import { decrypt, encrypt } from '@/common/helper/cryptography.helper';
+import { UpdateEmailConfigDto } from './dto/update-email-config.dto';
 
 @Injectable()
 export class EmailConfigService {
@@ -54,8 +55,7 @@ export class EmailConfigService {
     return decrypedEmailConfig;
   }
 
-  // TODO: Change the structure of dto to allow partial updates
-  async updateEmailConfig(userId: string, emailConfig: CreateEmailConfigDto) {
+  async updateEmailConfig(userId: string, emailConfig: UpdateEmailConfigDto) {
     if (!userId) {
       this.logger.warn('User id is required');
       throw new BadRequestException('User id is required');
@@ -63,13 +63,13 @@ export class EmailConfigService {
 
     const updatedEmailConfig = {
       ...emailConfig,
-      emailPassword: encrypt(emailConfig.emailPassword),
+      emailPassword: encrypt(emailConfig.emailPassword!),
     };
 
     return this.emailConfigModel
       .findOneAndUpdate(
         {
-          userId: new Types.ObjectId(userId),
+          userId,
         },
         updatedEmailConfig,
         { new: true },
