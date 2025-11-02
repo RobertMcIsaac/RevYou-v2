@@ -77,7 +77,7 @@ export class NotificationService {
         subject: 'RevYou Feedback Request',
         html: htmlContent,
       });
-      this.logger.log(`Notification sent to ${to} successfully.`);
+      this.logger.log(`Feedback request email sent successfully.`);
     } catch (error) {
       this.logger.error(`Failed to send notification: ${error}`);
       throw new Error('Failed to send notification');

@@ -1,0 +1,42 @@
+networks:
+  revyou-network:
+    driver: bridge
+
+services:
+  revyou-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - '${PORT}'
+    ports:
+      - '${PORT}:${PORT}'
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - MONGO_URI=${MONGO_URI}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - BASE_URL=${BASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - THROTTLE_LIMIT=${THROTTLE_LIMIT}
+      - THROTTLE_TTL=${THROTTLE_TTL}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+    depends_on:
+      - mongo-service
+    networks:
+      - revyou-network
+    command: sh -c "node dist/main.js"
+    restart: unless-stopped
+  mongo-service:
+    image: mongo:latest
+    expose:
+      - '27017'
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./_data/db:/data/db
+    networks:
+      - revyou-network
+    restart: unless-stopped
