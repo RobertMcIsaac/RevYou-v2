@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class FeedbackRequestDto {
   @ApiProperty({
@@ -9,6 +15,14 @@ export class FeedbackRequestDto {
   @IsNotEmpty()
   @IsString()
   userId: string;
+
+  @ApiProperty({
+    description: 'The name of the requester in email greetings',
+    example: 'John Doe',
+  })
+  @IsOptional()
+  @IsString()
+  fromName?: string;
 
   @ApiProperty({
     description: 'Personolised link to the feedback form',
@@ -24,4 +38,20 @@ export class FeedbackRequestDto {
   })
   @IsEmail()
   to: string;
+
+  @ApiProperty({
+    description: 'The name of the recipient',
+    example: 'Jane Smith',
+  })
+  @IsOptional()
+  @IsString()
+  toName?: string;
+
+  @ApiProperty({
+    description: 'The name of the project',
+    example: 'Project Alpha',
+  })
+  @IsOptional()
+  @IsString()
+  projectName: string;
 }

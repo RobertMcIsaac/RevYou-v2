@@ -21,6 +21,9 @@ export class NotificationController {
       feedbackRequestDto.userId,
       feedbackRequestDto.link,
       feedbackRequestDto.to,
+      feedbackRequestDto.projectName,
+      feedbackRequestDto.fromName,
+      feedbackRequestDto.toName,
     );
   }
 }
