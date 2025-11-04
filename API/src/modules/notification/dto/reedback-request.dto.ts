@@ -9,7 +9,7 @@ import {
 
 export class FeedbackRequestDto {
   @ApiProperty({
-    description: 'The ID of the user behalf whom the feedback request is sent',
+    description: 'The ID of the user who is requesting a feedback',
     example: '68da88dc60d04dd6fceacaf4',
   })
   @IsNotEmpty()
@@ -17,7 +17,8 @@ export class FeedbackRequestDto {
   userId: string;
 
   @ApiProperty({
-    description: 'The name of the requester in email greetings',
+    description:
+      'The name of the user making a feedback request, for use in email greetings',
     example: 'John Doe',
   })
   @IsOptional()
@@ -25,7 +26,7 @@ export class FeedbackRequestDto {
   fromName?: string;
 
   @ApiProperty({
-    description: 'Personolised link to the feedback form',
+    description: 'Personalised link to the feedback form',
     example: 'https://example.com/feedback',
   })
   @IsNotEmpty()
@@ -33,14 +34,14 @@ export class FeedbackRequestDto {
   link: string;
 
   @ApiProperty({
-    description: 'The recipient email address',
+    description: 'The reviewer email address to send the feedback request to',
     example: 'user@example.com',
   })
   @IsEmail()
   to: string;
 
   @ApiProperty({
-    description: 'The name of the recipient',
+    description: 'The name of the reviewer, for use in email',
     example: 'Jane Smith',
   })
   @IsOptional()
