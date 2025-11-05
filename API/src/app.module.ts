@@ -10,6 +10,7 @@ import { UserModule } from './modules/user/user.module';
 import { ProjectModule } from './modules/project/project.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { EmailConfigModule } from './modules/email-config/email-config.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { EmailConfigModule } from './modules/email-config/email-config.module';
     ProjectModule,
     AuthModule,
     EmailConfigModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [],
